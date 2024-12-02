@@ -64,7 +64,7 @@ class _SignInPageState extends State<SignInPage> {
                 child: TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  maxLength: 13,
+                  maxLength: 20,
 
                   decoration: InputDecoration(
                     hintText: '98912 XXXXX',
@@ -85,16 +85,18 @@ class _SignInPageState extends State<SignInPage> {
 
               ElevatedButton(
                 onPressed: () {
-                  String formatPhoneNumber(String phoneNumber) {
-                    if (!phoneNumber.startsWith('+')) {
-                      return '+91$phoneNumber'; // Add default country code (India).
+                  String formatPhoneNumber(String phone) {
+                    String countryCode = "+91"; // Replace with your country code
+                    if (!phone.startsWith("+")) {
+                      return countryCode + phone;
                     }
-                    return phoneNumber;
+                    return phone;
                   }
+
 
                   if (_formKey.currentState!.validate()) {
                     // Handle successful validation
-                    phoneVerificationService.verifyPhoneNumber(formatPhoneNumber(_phoneController.toString()));
+                    phoneVerificationService.verifyPhoneNumber(formatPhoneNumber(_phoneController.text.trim()));
 
                     Fluttertoast.showToast(
                         msg: "Processing.....",

@@ -4,6 +4,7 @@ import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
 
 import '../Screens/homePage/HomePage.dart';
 import '../Screens/photoUploadScreen/PhotoUploadScreen.dart';
+import '../Screens/profile/ProfileScreen.dart';
 
 
 class HomePageWrapper extends StatefulWidget {
@@ -19,7 +20,8 @@ class _HomePageWrapperState extends State<HomePageWrapper> {
 
   final List<Widget> _pages = [
     Homepage(),
-    PhotoUploadScreen()
+    PhotoUploadScreen(),
+    ProfileScreen()
     // Add other screens here that you want to navigate with BottomNavigationBar
   ];
 
