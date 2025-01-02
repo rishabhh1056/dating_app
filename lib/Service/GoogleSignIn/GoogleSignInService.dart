@@ -8,12 +8,22 @@ class GoogleSignInService {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
+      if (googleUser == null) {
+        print("Google sign-in canceled by user.");
+        return null; // User canceled the sign-in
+      }
+
       final GoogleSignInAuthentication? googleAuth =
-      await googleUser?.authentication;
+      await googleUser.authentication;
+
+      if (googleAuth == null || googleAuth.accessToken == null || googleAuth.idToken == null) {
+        print("Failed to retrieve Google authentication tokens.");
+        return null; // Authentication failed
+      }
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       return await FirebaseAuth.instance.signInWithCredential(credential);

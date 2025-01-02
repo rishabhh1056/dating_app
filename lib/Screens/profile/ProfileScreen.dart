@@ -1,6 +1,18 @@
+import 'package:dating_app/Screens/LoginPage/LoginIntroPage.dart';
+import 'package:dating_app/SharePerference/ParamConst.dart';
+import 'package:dating_app/SharePerference/Perference.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../../Service/GoogleSignIn/GoogleSignInService.dart';
 
 class ProfileScreen extends StatelessWidget {
+
+  GoogleSignInService signInObj = GoogleSignInService();
+  User? user = FirebaseAuth.instance.currentUser;
+
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -17,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Container(
                     height: height/4,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [Colors.blue, Colors.purple],
                         begin: Alignment.topLeft,
@@ -33,8 +45,16 @@ class ProfileScreen extends StatelessWidget {
                     top: height*0.03,
                     right: width*0.03,
                     child: IconButton(
-                      icon: Icon(Icons.settings, color: Colors.white),
-                      onPressed: () {
+                      icon: const Icon(Icons.settings, color: Colors.white),
+                      onPressed: () async {
+                        String? uid = user?.uid;
+                        await signInObj.signOutFromGoogle();
+                        SharedPrefHelper.setValue(ParamConst.isLogin, false);
+                        SharedPrefHelper.setValue(ParamConst.UID, null);
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginIntoPage()));
+
+                        Fluttertoast.showToast(msg: "User Logout Successfully", backgroundColor: Colors.green);
+                        print("User Uid :::::::::: $uid");
                         // Navigate to settings
                       },
                     ),
@@ -83,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Likes and Interests',
                     style: TextStyle(
                       fontSize: 18,
@@ -109,7 +129,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.favorite, // Change based on interests
                           color: Colors.red,
                           size: 30,
@@ -127,7 +147,7 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Photos',
                     style: TextStyle(
                       fontSize: 18,
@@ -153,7 +173,7 @@ class ProfileScreen extends StatelessWidget {
                                 blurRadius: 8,
                               ),
                             ],
-                            image: DecorationImage(
+                            image: const DecorationImage(
                               image: AssetImage('assets/example.jpg'), // Replace with dynamic photo
                               fit: BoxFit.cover,
                             ),

@@ -1,3 +1,5 @@
+import 'package:dating_app/Screens/homePage/HomePage.dart';
+import 'package:dating_app/SharePerference/ParamConst.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'Screens/LoginPage/LoginIntroPage.dart';
 import 'SharePerference/Perference.dart';
+import 'SplashScreen.dart';
+import 'bottomNavigationBar/HomePageWrapper.dart';
 import 'firebase_options.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -27,6 +31,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  var isLogin = SharedPrefHelper.getValue(ParamConst.isLogin, defaultValue: false);
+  var uid = SharedPrefHelper.getValue(ParamConst.UID, defaultValue: null);
+
+
+
+
   @override
   Widget build(BuildContext context) {
     // Set the status bar color
@@ -37,7 +48,7 @@ class _MyAppState extends State<MyApp> {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
       builder: FToastBuilder(),
-      home: const LoginIntoPage(),
+      home: isLogin && uid !=null ? const HomePageWrapper() : const LoginIntoPage(),
       navigatorKey: navigatorKey,
 
     );

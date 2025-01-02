@@ -1,8 +1,12 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
+import 'package:dating_app/models/basicDetailsModel/BasicDetailsModel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,6 +22,9 @@ class BasicDetailsPage extends StatefulWidget {
 }
 
 class _CreateProfileScreenState extends State<BasicDetailsPage> {
+
+  User? user = FirebaseAuth.instance.currentUser;
+  // DateTime currentDate = DateTime.parse("dd/mm/yyyy");
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -285,8 +292,8 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
                         // Gender dropdown field
                         DropdownButtonFormField<String>(
                           value: _selectedGender,
-                          icon: Icon(Icons.arrow_drop_down, color: AppColors.secondaryColor),
-                          decoration: InputDecoration(
+                          icon: const Icon(Icons.arrow_drop_down, color: AppColors.secondaryColor),
+                          decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.person_outline, color: AppColors.secondaryColor),
                             labelText: 'Gender',
                             labelStyle: TextStyle(color: AppColors.secondaryColor),
@@ -366,9 +373,43 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
                         SizedBox(height: height*0.06,),
 
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
+                            String? uid = user?.uid;
+
+                            if(_nameController.text.isNotEmpty && _addressController.text.isNotEmpty &&
+                                _birthdayController.text.isNotEmpty && _occupationController.text.isNotEmpty &&
+                                _profileImage != null ){
+
+                              // Reference to Firestore collection and the user's document using UID
+                              DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+
+                              // var data = BasicDetailsModel(profileImage: _profileImage!.path.toString(), name: _nameController.text.toString(), birthday: _birthdayController.text.toString(), occupation: _occupationController.text.toString(), address: _addressController.text.toString(), gender: _selectedGender, age: "18", skinType: _selectedSkinColor.toString(), height: _selectedHeight.toString());
+
+                              Map<String, dynamic> userData = {
+                                'name': _nameController.text,
+                                'age': 25,
+                                'address': _addressController.text,
+                                'occupation': _occupationController.text,
+                                'height': _selectedHeight,
+                                'skin_color': _selectedSkinColor,
+                                'createdAt': FieldValue.serverTimestamp(),  // Timestamp from Firebase
+                              };
+
+                              try {
+                                // Set the data for the user using their UID as the document ID
+                                await userRef.set(userData);
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
+                                Fluttertoast.showToast(msg: "User Data load Successfluuy");
+                              } catch (e) {
+                                print("Error adding user data: $e");
+                              }
+
+
+
+                            }else{
+                              Fluttertoast.showToast(msg: "Full-Fill All Details");
+                            }
 
                           },
                           style: ElevatedButton.styleFrom(
@@ -381,7 +422,7 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
                         ),
 
                         SizedBox(height: height*0.09,),
-                        
+
                         Text("* Please enter all details accurately to keep our database organized and show you relevant information.",
                         style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),)
 
@@ -419,7 +460,7 @@ class ProfileTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       keyboardType: inputType, // Set input type here
       maxLength: maxLength,
@@ -441,6 +482,7 @@ class ProfileTextField extends StatelessWidget {
         )
             : null,
       ),
+
     );
   }
 }

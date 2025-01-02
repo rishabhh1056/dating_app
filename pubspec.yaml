@@ -49,6 +49,8 @@ dependencies:
   firebase_auth: ^5.3.3
   google_sign_in: ^6.2.2
   fluttertoast: ^8.2.8
+  cloud_firestore: ^5.6.0
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
@@ -71,9 +73,6 @@ flutter:
   assets:
     - assets/images/
     - assets/anim/
-
-
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -98,6 +97,15 @@ flutter:
     - family: heading
       fonts:
         - asset: assets/fonts/PermanentMarker-Regular.ttf
+
+
+
+flutter_native_splash:
+  color: "#ffffff"  # Set the background color for the splash screen
+  image: "assets/images/logo.png"  # Path to your logo image
+  android: true  # Enable splash screen for Android
+  ios: true      # Enable splash screen for iOS
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

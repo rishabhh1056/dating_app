@@ -2,7 +2,10 @@
 import 'package:dating_app/Screens/profileDetails/BasicDetailsPage.dart';
 import 'package:dating_app/Service/FirebaseOtpService/PhoneVerificationService.dart';
 import 'package:dating_app/Service/GoogleSignIn/GoogleSignInService.dart';
+import 'package:dating_app/SharePerference/ParamConst.dart';
+import 'package:dating_app/SharePerference/Perference.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
@@ -118,19 +121,25 @@ class _SignInPageState extends State<SignInPage> {
 
              SizedBox(height: height*0.06,),
               
-              const Text("----------------Or----------------", style: TextStyle(color: Colors.black, fontSize: 22),),
+              const Text("Signup with", style: TextStyle(color: Colors.black, fontSize: 22),),
 
               SizedBox(height: height*0.06,),
               
               OutlinedButton(
                   onPressed: () async {
+                    User? user = FirebaseAuth.instance.currentUser;
+                    String? uid = user?.uid;
 
-                    userCredential.value = await signInObj.signInWithGoogle();
+                    final result = await signInObj.signInWithGoogle();
 
-                    if (userCredential.value != null && userCredential.value.user != null) {
+                    if (result != null && result.user != null) {
                       // Check if essential user information is available
-                      final user = userCredential.value.user!;
+                      final user = result.user!;
                       if (user.email != null && user.email!.isNotEmpty) {
+
+                        SharedPrefHelper.setValue(ParamConst.isLogin, true);
+                        SharedPrefHelper.setValue(ParamConst.UID, uid);
+                        print("User Uid :::::::::: $uid");
                         // Successfully signed in
                         Fluttertoast.showToast(
                           msg: "Successfully signed in with ${user.email}",
