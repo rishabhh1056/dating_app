@@ -386,6 +386,8 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
 
                               // var data = BasicDetailsModel(profileImage: _profileImage!.path.toString(), name: _nameController.text.toString(), birthday: _birthdayController.text.toString(), occupation: _occupationController.text.toString(), address: _addressController.text.toString(), gender: _selectedGender, age: "18", skinType: _selectedSkinColor.toString(), height: _selectedHeight.toString());
 
+
+
                               Map<String, dynamic> userData = {
                                 'name': _nameController.text,
                                 'age': 25,
@@ -398,9 +400,9 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
 
                               try {
                                 // Set the data for the user using their UID as the document ID
-                                await userRef.set(userData);
+                               await userRef.collection("BasicDetails").add(userData);
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
-                                Fluttertoast.showToast(msg: "User Data load Successfluuy");
+                                Fluttertoast.showToast(msg: "User Data load Successfully");
                               } catch (e) {
                                 print("Error adding user data: $e");
                               }
