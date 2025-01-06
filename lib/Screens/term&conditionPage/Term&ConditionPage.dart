@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../bottomNavigationBar/HomePageWrapper.dart';
+import '../../getMainCollection.dart';
 
 class TermsAndConditionsPage extends StatefulWidget {
   @override
@@ -165,18 +167,26 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                       ),
                       ElevatedButton(
                         onPressed: isChecked ? () {
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePageWrapper()));
+                          DocumentReference userRef = GetMainCollection().getCollection();
+                          DocumentReference childRef = userRef.collection("userData").doc("term&condition");
+
+                          Map<String, dynamic> userData ={
+                            "isChecked": isChecked
+                          };
+
+                          childRef.set(userData);
+                         Navigator.push(context, MaterialPageRoute(builder: (context)=> const HomePageWrapper()));
                         } : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isChecked ? AppColors.secondaryColor : Colors.deepPurple[200],
                           foregroundColor: Colors.white,
                           fixedSize: Size.fromWidth(width*0.6)
                         ),
-                        child: Text("Accept"),
+                        child: const Text("Accept"),
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),

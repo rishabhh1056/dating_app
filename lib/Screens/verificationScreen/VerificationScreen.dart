@@ -1,9 +1,12 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import '../../ThemeData/themeColors/AppColors.dart';
+import '../../getMainCollection.dart';
 import '../term&conditionPage/Term&ConditionPage.dart';
 
 
@@ -36,9 +39,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
     setState(() {
       if (pickedFile != null) {
         if (selectedDocumentType == 'Aadhaar' && isAadhaarFront) {
+          _documentImage = null;
           _aadhaarFrontImage = File(pickedFile.path);
         } else if (selectedDocumentType == 'Aadhaar' && !isAadhaarFront) {
           _aadhaarBackImage = File(pickedFile.path);
+          _documentImage = null;
         } else {
           _documentImage = File(pickedFile.path);
         }
@@ -59,6 +64,13 @@ class _VerificationScreenState extends State<VerificationScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              DocumentReference userRef = GetMainCollection().getCollection();
+              DocumentReference childRef = userRef.collection("userData").doc("profileVerification");
+              Map<String, dynamic> verificationSkip ={
+                "isVerified": false
+              };
+              childRef.set(verificationSkip);
+
               Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
             },
             child: Text('Skip', style: TextStyle(color: AppColors.accentColor)),
@@ -284,7 +296,40 @@ class _VerificationScreenState extends State<VerificationScreen> {
             // Continue Button
             ElevatedButton(
               onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                DocumentReference userRef = GetMainCollection().getCollection();
+                DocumentReference childRef = userRef.collection("userData").doc("profileVerification");
+                Map<String, dynamic> verificationData1 ={
+                  "profileImage": _profileImage?.path.toString(),
+                  "docImage": _documentImage?.path.toString(),
+                  "isVerified": true
+                };
+
+                Map<String, dynamic> verificationData2 ={
+                  "profileImage": _profileImage?.path.toString(),
+                  "aadhaarFrontImage": _aadhaarFrontImage?.path.toString(),
+                  "aadhaarBackImage": _aadhaarBackImage?.path.toString(),
+                  "isVerified": true
+                };
+
+                if(_profileImage != null && (_documentImage != null || (_aadhaarFrontImage != null && _aadhaarBackImage != null ))){
+
+                  if(selectedDocumentType == 'Aadhaar'){
+                    childRef.set(verificationData2);
+                    Fluttertoast.showToast(msg: "Verification send data via aadhaar");
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                  }
+                  else{
+                    childRef.set(verificationData1);
+                    Fluttertoast.showToast(msg: "Verification send data via other Docs");
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                  }
+                }
+                else{
+                  Fluttertoast.showToast(msg: "fill required thing");
+                }
+
+
+              // Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.darkBackgroundColor,

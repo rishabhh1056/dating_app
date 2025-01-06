@@ -1,22 +1,53 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dating_app/RiverPod/BasicDetailsNotifier.dart';
+import 'package:dating_app/RiverPod/InterestsNotifier.dart';
 import 'package:dating_app/Screens/LoginPage/LoginIntroPage.dart';
 import 'package:dating_app/SharePerference/ParamConst.dart';
 import 'package:dating_app/SharePerference/Perference.dart';
+import 'package:dating_app/getMainCollection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../Service/GoogleSignIn/GoogleSignInService.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerStatefulWidget  {
+  const ProfileScreen({super.key});
+
+  @override
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+
 
   GoogleSignInService signInObj = GoogleSignInService();
   User? user = FirebaseAuth.instance.currentUser;
+  bool isVerified = true;
 
+  @override
+  void initState() {
+    super.initState();
+    final user = this.user;
+    if(user != null){
+      ref.read(interestsProvider.notifier).initialize(user.uid, "interests");
+      ref.read(BasicDetailsProvider.notifier).fetchFirebaseData(user.uid, "BasicDetails");
+      ref.read(profilePhotosProvider.notifier).fetchFirebaseData(user.uid, "profilePhotos");
+      ref.read(profileVerificationProvider.notifier).fetchFirebaseData(user.uid, "profileVerification");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    final interests = ref.watch(interestsProvider);
+    final userData = ref.watch(BasicDetailsProvider);
+    final photos = ref.watch(profilePhotosProvider);
+    final isVerified = ref.watch(profileVerificationProvider);
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
@@ -52,7 +83,6 @@ class ProfileScreen extends StatelessWidget {
                         SharedPrefHelper.setValue(ParamConst.isLogin, false);
                         SharedPrefHelper.setValue(ParamConst.UID, null);
                         Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginIntoPage()));
-
                         Fluttertoast.showToast(msg: "User Logout Successfully", backgroundColor: Colors.green);
                         print("User Uid :::::::::: $uid");
                         // Navigate to settings
@@ -66,14 +96,13 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: height*0.05,
-                          backgroundImage: const NetworkImage("https://images.pexels.com/photos/1987301/pexels-photo-1987301.jpeg?auto=compress&cs=tinysrgb&w=600"),
+                          backgroundImage:  NetworkImage(userData?["profileImage"]?? "https://images.pexels.com/photos/1987301/pexels-photo-1987301.jpeg?auto=compress&cs=tinysrgb&w=600"),
                         ),
                         SizedBox(width: 20),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Jenny Wilson', // Replace with dynamic data
+                            Text(userData?["name"]?? "N/A", // Replace with dynamic data
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: width*0.05,
@@ -81,8 +110,14 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 5),
-                            Text(
-                              'London, Developer', // Replace with dynamic data
+                            Text( userData?["occupation"] ?? "N/A", // Replace with dynamic data
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: width*0.04,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text( userData?["address"] ?? "N/A", // Replace with dynamic data
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: width*0.04,
@@ -93,17 +128,26 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  Positioned(
+                    bottom: height*0.09, // Adjust position to align on the bottom-right
+                    left: width *0.19,
+                    child: SizedBox(
+                      width: height * 0.03, // Size of the dot (20% of the avatar's radius)
+                      height: height * 0.03,
+                      child: isVerified !=null? isVerified["isVerified"] == null   ? Image.asset("assets/images/verifiedIcon.png"): Image.asset("assets/images/unVerified.png") :  CircularProgressIndicator(),
+                    ),
+                  ),
                 ],
               ),
             ),
 
             // Interests Section
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+             Padding(
+              padding: EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Likes and Interests',
                     style: TextStyle(
                       fontSize: 18,
@@ -111,7 +155,15 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 15),
-                  GridView.count(
+
+                  Wrap(
+                    spacing: 8,
+                    children: interests.isNotEmpty?
+                    interests
+                        .map((interest) => Chip(label: Text(interest))) // Map each string to a Chip
+                        .toList(): []
+                  ),
+                  /*GridView.count(
                     crossAxisCount: 4,
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -136,7 +188,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       );
                     }),
-                  ),
+                  ),*/
                 ],
               ),
             ),
@@ -159,8 +211,10 @@ class ProfileScreen extends StatelessWidget {
                     height: 150,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: 5, // Number of photos
+                      itemCount: photos?["profile_Photos"].length, // Number of photos
                       itemBuilder: (context, index) {
+                        print("photos m h ${photos?["profile_Photos"][0]}");
+                        final photoUrl = photos?["profile_Photos"][index];
                         return Container(
                           margin: EdgeInsets.only(right: 15),
                           width: 120,
@@ -173,8 +227,8 @@ class ProfileScreen extends StatelessWidget {
                                 blurRadius: 8,
                               ),
                             ],
-                            image: const DecorationImage(
-                              image: AssetImage('assets/example.jpg'), // Replace with dynamic photo
+                            image:  DecorationImage(
+                              image: NetworkImage(photoUrl), // Replace with dynamic photo
                               fit: BoxFit.cover,
                             ),
                           ),

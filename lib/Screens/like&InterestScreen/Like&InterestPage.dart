@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating_app/SharePerference/ParamConst.dart';
 import 'package:dating_app/SharePerference/Perference.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../getMainCollection.dart';
 import '../PricingPage/PricingPage.dart';
 import '../verificationScreen/VerificationScreen.dart';
 
@@ -49,11 +52,28 @@ class _InterestsScreenState extends State<InterestsScreen> {
 
   void _nextBtn()async {
     var isUser = await SharedPrefHelper.getValue(ParamConst.user, defaultValue: false);
-
+    List getInterests = getSelectedInterests();
+    DocumentReference userRef = GetMainCollection().getCollection();
+    DocumentReference childRef = userRef.collection("userData").doc("interests");
+    Map<String, dynamic> userData ={
+      "interests": getInterests
+    };
     if(isUser){
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> VerificationScreen()));
+      if(getInterests.length > 4){
+        childRef.set(userData);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> VerificationScreen()));
+      }else{
+        Fluttertoast.showToast(msg: "please Select min 4 anyone");
+      }
+      //
     }else{
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> PricingPage()));
+      if(getInterests.length > 4){
+        childRef.set(userData);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> PricingPage()));
+      }else{
+        Fluttertoast.showToast(msg: "please Select min 4 anyone");
+      }
+
     }
 
   }

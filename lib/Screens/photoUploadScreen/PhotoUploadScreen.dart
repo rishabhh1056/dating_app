@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
+import 'package:dating_app/getMainCollection.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 
@@ -14,6 +17,13 @@ class PhotoUploadScreen extends StatefulWidget {
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   final List<XFile?> images = List.generate(6, (index) => null);
   final ImagePicker picker = ImagePicker();
+
+  final List<String> uploadImages = [
+    // Add URLs of the profile images here
+    "https://images.pexels.com/photos/27333760/pexels-photo-27333760/free-photo-of-portrait-of-a-man-smiling.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "https://images.pexels.com/photos/26859209/pexels-photo-26859209/free-photo-of-well-dressed-man-sitting-on-railing-of-balcony.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "https://images.pexels.com/photos/18968281/pexels-photo-18968281/free-photo-of-young-man-in-black-jacket-and-sneakers-on-sidewalk.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+  ];
 
   Future<void> _selectImage(int index) async {
     final XFile? pickedFile = await showDialog<XFile?>(
@@ -180,8 +190,27 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
             ElevatedButton(
               onPressed: () {
+                int nonNullImages = images.where((image) => image != null ).length;
 
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> InterestsScreen()));
+                List<File> selectedImages = images
+                    .where((image) => image != null) // Filter out null entries
+                    .map((image) => File(image!.path)) // Convert XFile to File
+                    .toList();
+
+                 if(nonNullImages >= 3){
+                   print("if part chala kya ${images.length}, $selectedImages");
+                   DocumentReference userRef = GetMainCollection().getCollection();
+                   DocumentReference childRef = userRef.collection("userData").doc("profilePhotos");
+                   Map<String, dynamic> userData = {
+                     "profile_Photos": uploadImages,
+                   };
+                   childRef.set(userData);
+                   Fluttertoast.showToast(msg: "photo Store Successfully");
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=> InterestsScreen()));
+                 }else{
+                   Fluttertoast.showToast(msg: "please add min 3 Pictures", backgroundColor: AppColors.darkSecondaryColor);
+                 }
+
 
               },
               style: ElevatedButton.styleFrom(
@@ -213,4 +242,5 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       ),
     );
   }
+
 }

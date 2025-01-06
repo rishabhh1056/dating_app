@@ -382,13 +382,14 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
                                 _profileImage != null ){
 
                               // Reference to Firestore collection and the user's document using UID
-                              DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+                              DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(uid).collection("userData").doc("BasicDetails");
 
                               // var data = BasicDetailsModel(profileImage: _profileImage!.path.toString(), name: _nameController.text.toString(), birthday: _birthdayController.text.toString(), occupation: _occupationController.text.toString(), address: _addressController.text.toString(), gender: _selectedGender, age: "18", skinType: _selectedSkinColor.toString(), height: _selectedHeight.toString());
 
 
 
                               Map<String, dynamic> userData = {
+                                'profileImage': "https://images.pexels.com/photos/1987301/pexels-photo-1987301.jpeg?auto=compress&cs=tinysrgb&w=600",
                                 'name': _nameController.text,
                                 'age': 25,
                                 'address': _addressController.text,
@@ -400,7 +401,7 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
 
                               try {
                                 // Set the data for the user using their UID as the document ID
-                               await userRef.collection("BasicDetails").add(userData);
+                               await userRef.set(userData);
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
                                 Fluttertoast.showToast(msg: "User Data load Successfully");
                               } catch (e) {
