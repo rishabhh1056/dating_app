@@ -60,16 +60,26 @@ class _InterestsScreenState extends State<InterestsScreen> {
     };
     if(isUser){
       if(getInterests.length > 4){
-        childRef.set(userData);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> VerificationScreen()));
+        try{
+          childRef.set(userData).then((_){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> VerificationScreen()));
+          });
+        }catch(e){
+          Fluttertoast.showToast(msg: "Something went wrong");
+        }
       }else{
         Fluttertoast.showToast(msg: "please Select min 4 anyone");
       }
       //
     }else{
       if(getInterests.length > 4){
-        childRef.set(userData);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> PricingPage()));
+        try{
+          childRef.set(userData).then((_){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> PricingPage()));
+          });
+        }catch(e){
+          Fluttertoast.showToast(msg: "Something went wrong");
+        }
       }else{
         Fluttertoast.showToast(msg: "please Select min 4 anyone");
       }
@@ -91,7 +101,8 @@ class _InterestsScreenState extends State<InterestsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+            },
             child: Text('Skip', style: TextStyle(color: Colors.blue)),
           ),
         ],

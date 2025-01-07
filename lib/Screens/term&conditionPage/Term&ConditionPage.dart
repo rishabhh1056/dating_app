@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dating_app/ThemeData/themeColors/AppColors.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../bottomNavigationBar/HomePageWrapper.dart';
@@ -174,8 +175,14 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                             "isChecked": isChecked
                           };
 
-                          childRef.set(userData);
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=> const HomePageWrapper()));
+                          try{
+                            childRef.set(userData).then((_){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=> const HomePageWrapper()));
+                            });
+                          }catch(e){
+                            Fluttertoast.showToast(msg: "Something went wrong");
+                            print("exception in term & condition $e");
+                          }
                         } : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isChecked ? AppColors.secondaryColor : Colors.deepPurple[200],

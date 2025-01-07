@@ -163,32 +163,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         .map((interest) => Chip(label: Text(interest))) // Map each string to a Chip
                         .toList(): []
                   ),
-                  /*GridView.count(
-                    crossAxisCount: 4,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    children: List.generate(8, (index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.favorite, // Change based on interests
-                          color: Colors.red,
-                          size: 30,
-                        ),
-                      );
-                    }),
-                  ),*/
                 ],
               ),
             ),
@@ -208,16 +182,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   SizedBox(height: 10),
                   SizedBox(
-                    height: 150,
-                    child: ListView.builder(
+                    height: height*0.4,
+                    child: photos != null ?
+                    ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: photos?["profile_Photos"].length, // Number of photos
+                      itemCount: photos["profile_Photos"].length, // Number of photos
                       itemBuilder: (context, index) {
-                        print("photos m h ${photos?["profile_Photos"][0]}");
-                        final photoUrl = photos?["profile_Photos"][index];
+                        print("photos m h ${photos["profile_Photos"][0]}");
+                        final photoUrl = photos["profile_Photos"][index];
                         return Container(
                           margin: EdgeInsets.only(right: 15),
-                          width: 120,
+                          width: width*0.9,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
@@ -234,7 +209,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                         );
                       },
-                    ),
+                    ):
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 3, // Number of photos
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.only(right: 15),
+                          width: 120,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                blurRadius: 8,
+                              ),
+                            ],
+                            image:  DecorationImage(
+                              image: NetworkImage("assets/images/placeholder.png"), // Replace with dynamic photo
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
+                    )
                   ),
                 ],
               ),

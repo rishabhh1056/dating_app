@@ -401,9 +401,10 @@ class _CreateProfileScreenState extends State<BasicDetailsPage> {
 
                               try {
                                 // Set the data for the user using their UID as the document ID
-                               await userRef.set(userData);
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
-                                Fluttertoast.showToast(msg: "User Data load Successfully");
+                               await userRef.set(userData).then((_){
+                                 Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoUploadScreen()));
+                                 Fluttertoast.showToast(msg: "User Data load Successfully");
+                               });
                               } catch (e) {
                                 print("Error adding user data: $e");
                               }

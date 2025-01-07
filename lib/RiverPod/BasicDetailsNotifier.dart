@@ -15,6 +15,10 @@ final profileVerificationProvider = StateNotifierProvider<BasicDetailsNotifier, 
       (ref) => BasicDetailsNotifier(),
 );
 
+final termAndConditionDetailProvider = StateNotifierProvider<BasicDetailsNotifier, Map<String, dynamic>?>(
+      (ref) => BasicDetailsNotifier(),
+);
+
 class BasicDetailsNotifier extends StateNotifier<Map<String, dynamic>?>{
   BasicDetailsNotifier() :super(null);
 

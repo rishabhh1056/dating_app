@@ -69,9 +69,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
               Map<String, dynamic> verificationSkip ={
                 "isVerified": false
               };
-              childRef.set(verificationSkip);
+              try{
+                childRef.set(verificationSkip).then((_){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                });
+              }catch(e){
+                print("exception in skip Verification $e");
+              }
 
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
             },
             child: Text('Skip', style: TextStyle(color: AppColors.accentColor)),
           ),
@@ -314,14 +319,28 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 if(_profileImage != null && (_documentImage != null || (_aadhaarFrontImage != null && _aadhaarBackImage != null ))){
 
                   if(selectedDocumentType == 'Aadhaar'){
-                    childRef.set(verificationData2);
-                    Fluttertoast.showToast(msg: "Verification send data via aadhaar");
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                    try{
+                      childRef.set(verificationData2).then((_){
+                        Fluttertoast.showToast(msg: "Verification send data via aadhaar");
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                      });
+                    }
+                    catch(e){
+                      print("exception in aadhaar Verification $e");
+                    }
+
                   }
                   else{
-                    childRef.set(verificationData1);
-                    Fluttertoast.showToast(msg: "Verification send data via other Docs");
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                    try{
+                      childRef.set(verificationData1).then((_){
+                        Fluttertoast.showToast(msg: "Verification send data via other Docs");
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> TermsAndConditionsPage()));
+                      });
+                    }
+                    catch(e){
+                      print("exception in doc Verification $e");
+                    }
+
                   }
                 }
                 else{

@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
+import '../MidSplashsScreen/checkLoginAccount.dart';
 import 'otpVerificationPage.dart';
 
 class SignInPage extends StatefulWidget {
@@ -24,9 +25,16 @@ class _SignInPageState extends State<SignInPage> {
   PhoneVerificationService  phoneVerificationService = PhoneVerificationService();
 
   @override
+  void initState() {
+    super.initState();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -138,7 +146,7 @@ class _SignInPageState extends State<SignInPage> {
                       if (user.email != null && user.email!.isNotEmpty) {
 
                         SharedPrefHelper.setValue(ParamConst.isLogin, true);
-                        SharedPrefHelper.setValue(ParamConst.UID, uid);
+                        // SharedPrefHelper.setValue(ParamConst.UID, uid);
                         print("User Uid :::::::::: $uid");
                         // Successfully signed in
                         Fluttertoast.showToast(
@@ -151,7 +159,7 @@ class _SignInPageState extends State<SignInPage> {
                         // Navigate to BasicDetailsPage
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => BasicDetailsPage()),
+                          MaterialPageRoute(builder: (context) => checkLoginAccount()),
                         );
                       } else {
                         // Handle case where email is unavailable
@@ -163,9 +171,13 @@ class _SignInPageState extends State<SignInPage> {
                             textColor: Colors.black,
                             toastLength: Toast.LENGTH_LONG);
 
+                        SharedPrefHelper.setValue(ParamConst.isLogin, true);
+                        SharedPrefHelper.setValue(ParamConst.UID, uid);
+                        print("User Uid :::::::::: $uid");
+
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => BasicDetailsPage()),
+                          MaterialPageRoute(builder: (context) => checkLoginAccount()),
                         );
 
                       }

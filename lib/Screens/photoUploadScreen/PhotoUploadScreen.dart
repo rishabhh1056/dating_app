@@ -204,9 +204,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                    Map<String, dynamic> userData = {
                      "profile_Photos": uploadImages,
                    };
-                   childRef.set(userData);
-                   Fluttertoast.showToast(msg: "photo Store Successfully");
-                   Navigator.push(context, MaterialPageRoute(builder: (context)=> InterestsScreen()));
+                   childRef.set(userData).then((_){
+                     Fluttertoast.showToast(msg: "photo Store Successfully");
+                     Navigator.push(context, MaterialPageRoute(builder: (context)=> InterestsScreen()));
+                   });
+
                  }else{
                    Fluttertoast.showToast(msg: "please add min 3 Pictures", backgroundColor: AppColors.darkSecondaryColor);
                  }
